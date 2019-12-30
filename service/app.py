@@ -1,4 +1,3 @@
-# TODO: Implement flashtext
 import logging
 import os
 
@@ -9,12 +8,10 @@ import random
 import string
 import subprocess
 
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, send_file
 from flask_table.html import element
-from flask import send_file
-from flask_table import Col, Table, LinkCol
+from flask_table import Col, Table
 
-from werkzeug.utils import secure_filename
 from gevent.pywsgi import WSGIServer
 
 PORT = 80
@@ -28,7 +25,10 @@ try:
     print("Windows")
 except Exception as exc:
     cmd = "ip a | grep 'inet 192'"
-    ps = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    ps = subprocess.Popen(cmd,
+                          shell=True,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.STDOUT)
     output = ps.communicate()[0]
     print(output)
     print("PORT: ", PORT)
@@ -38,7 +38,6 @@ except Exception as exc:
 
 def searching_all_files(directory):
     dirpath = Path(directory)
-    assert(dirpath.is_dir())
     directory_list = defaultdict(list)
     for x in dirpath.iterdir():
         if x.is_file():
@@ -103,13 +102,13 @@ if __name__ == '__main__':
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
             flash("Upload successful")
 
-            
+
         # list files
         directory_list = searching_all_files(app.config['UPLOAD_FOLDER'])
 
         tableau = make_table(directory_list)
         return render_template("front.html",
-                                tableau=tableau)
+                               tableau=tableau)
 
     @app.route('/d', methods=['GET'])
     def dlfile():

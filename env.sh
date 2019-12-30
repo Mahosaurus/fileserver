@@ -1,3 +1,3 @@
-python -m venv gpx
-source gpx/bin/activate
+python -m venv fileserver
+source fileserver/bin/activate
 pip install -r requirements.txt
