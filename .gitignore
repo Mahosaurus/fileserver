@@ -1,6 +1,8 @@
 .vscode/*
-resources/*
+fileserver/*
 gpx/*
+*gpx
+*jpg
 __pycache__/
 *.py[cod]
 *$py.class

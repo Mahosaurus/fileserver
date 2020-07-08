@@ -14,17 +14,19 @@ from flask_table import Col, Table
 
 from gevent.pywsgi import WSGIServer
 
-PORT = 80
+
 
 # Detect OS
 try:
     subprocess.run("ipconfig")
+    PORT = 80
     print("PORT: ", PORT)
     windows = True
     linux = False
-    print("Windows")
+    print("OS: Windows")
 except Exception as exc:
     cmd = "ip a | grep 'inet 192'"
+    PORT = 5555
     ps = subprocess.Popen(cmd,
                           shell=True,
                           stdout=subprocess.PIPE,
@@ -34,18 +36,16 @@ except Exception as exc:
     print("PORT: ", PORT)
     linux = True
     windows = False
-    print("Linux")
+    print("OS: Linux")
 
 def searching_all_files(directory):
     dirpath = Path(directory)
     directory_list = defaultdict(list)
     for x in dirpath.iterdir():
         if x.is_file():
-            directory_list[str(x)].append(x)     
+            directory_list[str(x)].append(x)
         if x.is_dir():
             directory_list[str(x)] = searching_all_files(x)
-    # Sort dict
-    print("a: ", directory_list)
     return directory_list
 
 def make_table(directory_list):
@@ -70,7 +70,7 @@ class ExternalURLCol(Col):
 
 class Item():
     def __init__(self, filepath):
-        self.name = filepath
+        self.name = str.replace(filepath, str(app.config['UPLOAD_FOLDER']), "")
         self.url = "d?file=" + str(filepath)
 
 class ItemTable(Table):
@@ -118,7 +118,7 @@ if __name__ == '__main__':
     print("Starting app...")
     # DEBUG
     if linux:
-        app.run()
+        app.run(host='0.0.0.0', port=int(PORT))
     # PRD
     if windows:
         HTTP_SERVER = WSGIServer(('0.0.0.0', int(PORT)), app)
