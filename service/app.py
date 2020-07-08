@@ -39,13 +39,16 @@ except Exception as exc:
     print("OS: Linux")
 
 def searching_all_files(directory):
+    """ This works only one level up even though you might think its a recursion """
     dirpath = Path(directory)
     directory_list = defaultdict(list)
     for x in dirpath.iterdir():
         if x.is_file():
             directory_list[str(x)].append(x)
         if x.is_dir():
-            directory_list[str(x)] = searching_all_files(x)
+            results = searching_all_files(x)
+            for key in results:
+                directory_list[key] = [key]
     return directory_list
 
 def make_table(directory_list):
@@ -78,7 +81,7 @@ class ItemTable(Table):
 
 if __name__ == '__main__':
     app = Flask(__name__)
-    app.debug = True
+    app.debug = False
     app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
     app.config['SECRET_KEY'] = ''.join(random.choice(string.ascii_lowercase) for _ in range(20))
     app.config['UPLOAD_FOLDER'] = Path(Path(__file__).resolve()).parent.parent.joinpath("resources")
