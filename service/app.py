@@ -11,10 +11,9 @@ import subprocess
 from flask import Flask, render_template, request, redirect, flash, send_file
 from flask_table.html import element
 from flask_table import Col, Table
+from flask import request
 
 from gevent.pywsgi import WSGIServer
-
-
 
 # Detect OS
 try:
@@ -73,7 +72,7 @@ class ExternalURLCol(Col):
 
 class Item():
     def __init__(self, filepath):
-        self.name = str.replace(filepath, str(app.config['UPLOAD_FOLDER']), "")
+        self.name = str.replace(filepath, str(app.config['FOLDER']), "")
         self.url = "d?file=" + str(filepath)
 
 class ItemTable(Table):
@@ -82,10 +81,10 @@ class ItemTable(Table):
 if __name__ == '__main__':
     app = Flask(__name__)
     app.debug = False
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+    app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 1024
     app.config['SECRET_KEY'] = ''.join(random.choice(string.ascii_lowercase) for _ in range(20))
-    app.config['UPLOAD_FOLDER'] = Path(Path(__file__).resolve()).parent.parent.joinpath("resources")
-    print(app.config['UPLOAD_FOLDER'])
+    app.config['UPLOAD_FOLDER'] = Path(Path(__file__).resolve()).parent.parent.joinpath("resources").joinpath("upload")
+    app.config['FOLDER'] = Path(Path(__file__).resolve()).parent.parent.joinpath("resources")
 
     print("Running app...")
     @app.route('/', methods=['GET', 'POST'])
@@ -94,20 +93,22 @@ if __name__ == '__main__':
             # check if the post request has the file part
             if 'file' not in request.files:
                 return redirect(request.url)
-            file = request.files['file']
+            files = request.files.getlist("file")
+            print(files)
             # if user does not select file, browser also
             # submit an empty part without filename
-            if file.filename == '':
-                return redirect(request.url)
-            if linux:
-                file.save(app.config['UPLOAD_FOLDER'].joinpath(file.filename).resolve())
-            if windows:
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
-            flash("Upload successful")
+            for curr_file in files:
+                if curr_file.filename == '':
+                    return redirect(request.url)
+                if linux:
+                    curr_file.save(app.config['UPLOAD_FOLDER'].joinpath(curr_file.filename).resolve())
+                if windows:
+                    curr_file.save(os.path.join(app.config['UPLOAD_FOLDER'], curr_file.filename))
+                flash("Upload successful")
 
 
         # list files
-        directory_list = searching_all_files(app.config['UPLOAD_FOLDER'])
+        directory_list = searching_all_files(app.config['FOLDER'])
 
         tableau = make_table(directory_list)
         return render_template("front.html",

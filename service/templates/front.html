@@ -10,11 +10,11 @@
           border: 1px solid #ddd;
           padding: 8px;
         }
-        
+
         #myTable tr:nth-child(even){background-color: #f2f2f2;}
-        
+
         #myTable tr:hover {background-color: #ddd;}
-        
+
         #myTable th {
           padding-top: 12px;
           padding-bottom: 12px;
@@ -25,10 +25,11 @@
         </style>
 <h1>Upload new File</h1>
 <form method=post enctype=multipart/form-data>
-  <input type=file name=file>
+  <input type=file name=file size=40 multiple>
   <input type=submit value=Upload>
 </form>
-<h1>Upload existing File</h1>
+#########################################################################################
+<h1>Download existing File</h1>
 {{tableau}}
 
 </html>
