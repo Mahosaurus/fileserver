@@ -17,7 +17,7 @@ if os == "windows":
     subprocess.run("ipconfig")
     PORT = 80
 elif os == "linux":
-    PORT = 5555
+    PORT = 5556
     ps = subprocess.Popen(
         ["ip", "a"],
         stdout=subprocess.PIPE,
@@ -77,9 +77,9 @@ if __name__ == '__main__':
     print("Starting app...")
     # DEBUG
     if platform == "linux":
-        #app.run(host='0.0.0.0', port=int(PORT))
-        HTTP_SERVER = WSGIServer(('0.0.0.0', int(PORT)), app)
-        HTTP_SERVER.serve_forever()
+        app.run(host='0.0.0.0', port=int(PORT))
+        #HTTP_SERVER = WSGIServer(('0.0.0.0', int(PORT)), app)
+        #HTTP_SERVER.serve_forever()
     # PRD
     if platform == "windows":
         HTTP_SERVER = WSGIServer(('0.0.0.0', int(PORT)), app)
